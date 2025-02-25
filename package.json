@@ -1,7 +1,6 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
@@ -21,9 +20,19 @@
     "jwt-simple": "^0.5.6",
     "mongoose": "^8.10.0",
     "multer": "^1.4.5-lts.1",
-    "prisma": "^6.3.1"
+    "prisma": "^6.3.1",
+    "stripe": "^17.6.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chinhvslenzoloo/back-end.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chinhvslenzoloo/back-end/issues"
+  },
+  "homepage": "https://github.com/chinhvslenzoloo/back-end#readme",
+  "description": ""
 }

@@ -8,6 +8,7 @@ const orderRoutes = require("./routes/orderRouter");
 const userRoutes = require("./routes/userRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const PaymentController = require("./Controllers/PaymentController");
 
 const app = express();
 
@@ -28,6 +29,8 @@ app.use("/orders", orderRoutes);
 app.use("/users", userRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/admin", adminRoutes);
+app.get("/", PaymentController.getStatus);
+app.post("/create-payment-intent", PaymentController.createPaymentIntent);
 
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {

@@ -1,11 +1,11 @@
-const {PrismaClient} = require("@prisma/client");
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 exports.getAllUsers = async (req, res) => {
   if (!req.user || req.user.role !== "admin") {
     return res
       .status(403)
-      .json({message: "Та админ эрхтэй хэрэглэгч биш байна!"});
+      .json({ message: "Та админ эрхтэй хэрэглэгч биш байна!" });
   }
 
   try {
@@ -16,7 +16,7 @@ exports.getAllUsers = async (req, res) => {
     res.json(user);
   } catch (error) {
     console.error("Алдаа гарлаа:", error);
-    res.status(500).json({message: "Серверийн алдаа гарлаа!"});
+    res.status(500).json({ message: "Серверийн алдаа гарлаа!" });
   }
 };
 
@@ -24,17 +24,17 @@ exports.createProduct = async (req, res) => {
   if (!req.user || req.user.role !== "admin") {
     return res
       .status(403)
-      .json({message: "Та админ эрхтэй хэрэглэгч биш байна!"});
+      .json({ message: "Та админ эрхтэй хэрэглэгч биш байна!" });
   }
 
-  const {name, description, price, size, color, stockQuantity, categoryId} =
+  const { name, description, price, size, color, stockQuantity, categoryId } =
     req.body;
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+  const imageUrl = req.file ? `/${req.file.filename}` : null;
 
   if (!name || !price || !categoryId) {
     return res
       .status(400)
-      .json({message: "Бүтээгдэхүүний нэр, үнэ болон ангилал оруулна уу!"});
+      .json({ message: "Бүтээгдэхүүний нэр, үнэ болон ангилал оруулна уу!" });
   }
 
   try {
@@ -46,7 +46,7 @@ exports.createProduct = async (req, res) => {
         size,
         color,
         stockQuantity: parseInt(stockQuantity),
-        imageBase64: imageUrl,
+        imageUrl,
         categoryId: parseInt(categoryId),
       },
     });
@@ -57,7 +57,7 @@ exports.createProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("Алдаа гарлаа:", error);
-    res.status(500).json({message: "Серверийн алдаа гарлаа!", error});
+    res.status(500).json({ message: "Серверийн алдаа гарлаа!", error });
   }
 };
 
@@ -65,21 +65,21 @@ exports.deleteUser = async (req, res) => {
   if (!req.user || req.user.role !== "admin") {
     return res
       .status(403)
-      .json({message: "Та админ эрхтэй хэрэглэгч биш байна!"});
+      .json({ message: "Та админ эрхтэй хэрэглэгч биш байна!" });
   }
 
-  const {userId} = req.params;
+  const { userId } = req.params;
 
   try {
     // Хэрэглэгчийг устгах
     const deletedUser = await prisma.user.delete({
-      where: {id: parseInt(userId)},
+      where: { id: parseInt(userId) },
     });
 
-    res.json({message: "Хэрэглэгч амжилттай устгагдлаа!", user: deletedUser});
+    res.json({ message: "Хэрэглэгч амжилттай устгагдлаа!", user: deletedUser });
   } catch (error) {
     console.error("Алдаа гарлаа:", error);
-    res.status(500).json({message: "Серверийн алдаа гарлаа!", error});
+    res.status(500).json({ message: "Серверийн алдаа гарлаа!", error });
   }
 };
 
@@ -87,13 +87,13 @@ exports.createCategory = async (req, res) => {
   if (!req.user || req.user.role !== "admin") {
     return res
       .status(403)
-      .json({message: "Та админ эрхтэй хэрэглэгч биш байна!"});
+      .json({ message: "Та админ эрхтэй хэрэглэгч биш байна!" });
   }
 
-  const {name, description} = req.body;
+  const { name, description } = req.body;
 
   if (!name) {
-    return res.status(400).json({message: "Категори нэрийг оруулна уу!"});
+    return res.status(400).json({ message: "Категори нэрийг оруулна уу!" });
   }
 
   try {
@@ -111,7 +111,7 @@ exports.createCategory = async (req, res) => {
     });
   } catch (error) {
     console.error("Алдаа гарлаа:", error);
-    res.status(500).json({message: "Серверийн алдаа гарлаа!", error});
+    res.status(500).json({ message: "Серверийн алдаа гарлаа!", error });
   }
 };
 
@@ -119,15 +119,15 @@ exports.deleteProduct = async (req, res) => {
   if (!req.user || req.user.role !== "admin") {
     return res
       .status(403)
-      .json({message: "Та админ эрхтэй хэрэглэгч биш байна!"});
+      .json({ message: "Та админ эрхтэй хэрэглэгч биш байна!" });
   }
 
-  const {productId} = req.params;
+  const { productId } = req.params;
 
   try {
     // Бүтээгдэхүүнийг устгах
     const deletedProduct = await prisma.product.delete({
-      where: {id: parseInt(productId)},
+      where: { id: parseInt(productId) },
     });
 
     res.json({
@@ -136,7 +136,7 @@ exports.deleteProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("Алдаа гарлаа:", error);
-    res.status(500).json({message: "Серверийн алдаа гарлаа!", error});
+    res.status(500).json({ message: "Серверийн алдаа гарлаа!", error });
   }
 };
 
@@ -144,15 +144,15 @@ exports.deleteCategory = async (req, res) => {
   if (!req.user || req.user.role !== "admin") {
     return res
       .status(403)
-      .json({message: "Та админ эрхтэй хэрэглэгч биш байна!"});
+      .json({ message: "Та админ эрхтэй хэрэглэгч биш байна!" });
   }
 
-  const {categoryId} = req.params;
+  const { categoryId } = req.params;
 
   try {
     // Категорийг устгах
     const deletedCategory = await prisma.category.delete({
-      where: {id: parseInt(categoryId)},
+      where: { id: parseInt(categoryId) },
     });
 
     res.json({
@@ -161,7 +161,7 @@ exports.deleteCategory = async (req, res) => {
     });
   } catch (error) {
     console.error("Алдаа гарлаа:", error);
-    res.status(500).json({message: "Серверийн алдаа гарлаа!", error});
+    res.status(500).json({ message: "Серверийн алдаа гарлаа!", error });
   }
 };
 
@@ -169,25 +169,25 @@ exports.updateProduct = async (req, res) => {
   if (!req.user || req.user.role !== "admin") {
     return res
       .status(403)
-      .json({message: "Та админ эрхтэй хэрэглэгч биш байна!"});
+      .json({ message: "Та админ эрхтэй хэрэглэгч биш байна!" });
   }
 
-  const {productId} = req.params;
-  const {name, description, price, size, color, stockQuantity, categoryId} =
+  const { productId } = req.params;
+  const { name, description, price, size, color, stockQuantity, categoryId } =
     req.body;
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+  const imageUrl = req.file ? `${req.file.filename}` : null;
 
   try {
     const existingProduct = await prisma.product.findUnique({
-      where: {id: parseInt(productId)},
+      where: { id: parseInt(productId) },
     });
 
     if (!existingProduct) {
-      return res.status(404).json({message: "Бүтээгдэхүүн олдсонгүй!"});
+      return res.status(404).json({ message: "Бүтээгдэхүүн олдсонгүй!" });
     }
 
     const updatedProduct = await prisma.product.update({
-      where: {id: parseInt(productId)},
+      where: { id: parseInt(productId) },
       data: {
         name,
         description,
@@ -195,7 +195,7 @@ exports.updateProduct = async (req, res) => {
         size,
         color,
         stockQuantity: parseInt(stockQuantity),
-        imageBase64: imageUrl || existingProduct.imageBase64, // Зураг байгаа бол шинэчилнэ
+        imageUrl: imageUrl || existingProduct.imageUrl, // Зураг байгаа бол шинэчилнэ
         categoryId: parseInt(categoryId),
       },
     });
@@ -206,14 +206,14 @@ exports.updateProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("Алдаа гарлаа:", error);
-    res.status(500).json({message: "Серверийн алдаа гарлаа!", error});
+    res.status(500).json({ message: "Серверийн алдаа гарлаа!", error });
   }
 };
 exports.getAllProducts = async (req, res) => {
   if (!req.user || req.user.role !== "admin") {
     return res
       .status(403)
-      .json({message: "Та админ эрхтэй хэрэглэгч биш байна!"});
+      .json({ message: "Та админ эрхтэй хэрэглэгч биш байна!" });
   }
 
   try {
@@ -221,7 +221,7 @@ exports.getAllProducts = async (req, res) => {
     res.json(products);
   } catch (error) {
     console.error("Алдаа гарлаа:", error);
-    res.status(500).json({message: "Серверийн алдаа гарлаа!"});
+    res.status(500).json({ message: "Серверийн алдаа гарлаа!" });
   }
 };
 
@@ -229,7 +229,7 @@ exports.getAllCategories = async (req, res) => {
   if (!req.user || req.user.role !== "admin") {
     return res
       .status(403)
-      .json({message: "Та админ эрхтэй хэрэглэгч биш байна!"});
+      .json({ message: "Та админ эрхтэй хэрэглэгч биш байна!" });
   }
 
   try {
@@ -237,7 +237,7 @@ exports.getAllCategories = async (req, res) => {
     res.json(categories);
   } catch (error) {
     console.error("Алдаа гарлаа:", error);
-    res.status(500).json({message: "Серверийн алдаа гарлаа!"});
+    res.status(500).json({ message: "Серверийн алдаа гарлаа!" });
   }
 };
 

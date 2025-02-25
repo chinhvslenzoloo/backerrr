@@ -1,15 +1,25 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+require("dotenv").config();
 
-exports.createPaymentIntent = async (req, res) => {
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: req.body.amount,
-      currency: "usd",
-      payment_method_types: ["card"],
-    });
-
-    res.json({clientSecret: paymentIntent.client_secret});
-  } catch (error) {
-    res.status(500).json({error: error.message});
+class PaymentController {
+  static getStatus(req, res) {
+    res.send("✅ Сервер ажиллаж байна!");
   }
-};
+
+  static async createPaymentIntent(req, res) {
+    try {
+      const { amount, currency } = req.body;
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency,
+      });
+
+      res.send({ clientSecret: paymentIntent.client_secret });
+    } catch (error) {
+      res.status(500).send({ error: error.message });
+    }
+  }
+}
+
+module.exports = PaymentController;

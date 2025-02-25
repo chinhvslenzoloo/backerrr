@@ -18,7 +18,7 @@ const router = express.Router();
 
 router.get("/admins", authMiddleware, isAdmin, getAllUsers);
 router.post(
-  "/products",
+  "/createProducts",
   authMiddleware,
   isAdmin,
   upload.single("imageUrl"),

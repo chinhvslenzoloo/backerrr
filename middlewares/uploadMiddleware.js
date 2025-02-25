@@ -14,21 +14,21 @@ const storage = multer.diskStorage({
 
 // Хүлээн авах зөвшөөрөгдсөн файлууд
 const fileFilter = (req, file, cb) => {
-  const filetypes = /jpeg|jpg|png|gif/;
+  const filetypes = /jpeg|jpg|png|gif|jfif/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = filetypes.test(file.mimetype);
 
   if (extname && mimetype) {
-    return cb(null, true);
+    return cb(null, true); // Зөв төрөлтэй бол зөвшөөрөх
   } else {
-    cb(new Error("Тодорхой төрлийн зураг оруулна уу!"));
+    cb(new Error("Тодорхой төрлийн зураг оруулна уу!"), false); // Алдаа гаргах
   }
 };
 
 const upload = multer({
   storage,
   fileFilter,
-  limits: {fileSize: 10 * 1024 * 1024}, // 10MB хүртэл файлуудыг хүлээн авна
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB хүртэл файлуудыг хүлээн авна
 });
 
 module.exports = upload;
