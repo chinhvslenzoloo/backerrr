@@ -9,6 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const PaymentController = require("./Controllers/PaymentController");
+const profitRoutes = require("./routes/profitRoutes");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/orders", orderRoutes);
 app.use("/users", userRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/admin", adminRoutes);
+app.use("/api/profit", profitRoutes);
 app.get("/", PaymentController.getStatus);
 app.post("/create-payment-intent", PaymentController.createPaymentIntent);
 

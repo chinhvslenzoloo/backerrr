@@ -1,9 +1,9 @@
-const {PrismaClient} = require("@prisma/client");
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-// Create a new order
 exports.createOrder = async (req, res) => {
-  const {userId, cartItems} = req.body; // userId and cart items should be passed in the body
+  const { userId, cartItems } = req.body;
 
   try {
     const orderItems = cartItems.map((item) => ({
@@ -12,70 +12,115 @@ exports.createOrder = async (req, res) => {
       price: item.price,
     }));
 
-    // Create a new order and associate it with the user
     const order = await prisma.order.create({
       data: {
-        user: {connect: {id: userId}},
+        user: { connect: { id: userId } },
         orderItems: {
           create: orderItems,
         },
         totalPrice: cartItems.reduce(
           (total, item) => total + item.price * item.quantity,
           0
-        ), // Calculate total price
+        ),
       },
     });
 
-    // Clear the user's cart after creating the order
-    await prisma.cartItem.deleteMany({where: {userId}});
+    await prisma.cartItem.deleteMany({ where: { userId } });
 
-    res.status(201).json({message: "Order created successfully!", order});
+    res.status(201).json({ message: "Order created successfully!", order });
   } catch (error) {
-    res.status(500).json({error: "Failed to create order!"});
+    res.status(500).json({ error: "Failed to create order!" });
   }
 };
 
-// Get all orders for a user
 exports.getUserOrders = async (req, res) => {
-  const {userId} = req.params;
+  const { userId } = req.params;
 
   try {
     const orders = await prisma.order.findMany({
-      where: {userId: parseInt(userId)},
+      where: { userId: parseInt(userId) },
       include: {
         orderItems: {
           include: {
-            product: true, // Include product details in the order item response
+            product: true,
           },
         },
       },
     });
 
     if (orders.length === 0) {
-      return res.status(404).json({message: "No orders found!"});
+      return res.status(404).json({ message: "No orders found!" });
     }
 
     res.status(200).json(orders);
   } catch (error) {
-    res.status(500).json({error: "Error fetching orders!"});
+    res.status(500).json({ error: "Error fetching orders!" });
   }
 };
 
-// Update the status of an order
 exports.updateOrderStatus = async (req, res) => {
-  const {orderId} = req.params;
-  const {status} = req.body;
+  const { orderId } = req.params;
+  const { status } = req.body;
 
   try {
     const order = await prisma.order.update({
-      where: {id: parseInt(orderId)},
-      data: {status},
+      where: { id: parseInt(orderId) },
+      data: { status },
     });
 
     res
       .status(200)
-      .json({message: "Order status updated successfully!", order});
+      .json({ message: "Order status updated successfully!", order });
   } catch (error) {
-    res.status(500).json({error: "Failed to update order status!"});
+    res.status(500).json({ error: "Failed to update order status!" });
   }
+};
+
+// Stripe Webhook хүлээн авалт
+exports.handleStripeWebhook = async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object;
+    const userId = paymentIntent.metadata.userId;
+    const cartItems = JSON.parse(paymentIntent.metadata.cartItems);
+
+    try {
+      const orderItems = cartItems.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+      }));
+
+      const order = await prisma.order.create({
+        data: {
+          user: { connect: { id: userId } },
+          orderItems: {
+            create: orderItems,
+          },
+          totalPrice: cartItems.reduce(
+            (total, item) => total + item.price * item.quantity,
+            0
+          ),
+        },
+      });
+
+      await prisma.cartItem.deleteMany({ where: { userId } });
+
+      res.status(200).json({ message: "Order created successfully!", order });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create order!" });
+    }
+  }
+
+  res.status(200).json({ received: true });
 };

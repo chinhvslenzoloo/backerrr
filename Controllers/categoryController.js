@@ -1,20 +1,18 @@
 const prisma = require("@prisma/client");
-const {PrismaClient} = prisma;
+const { PrismaClient } = prisma;
 const prismaClient = new PrismaClient();
 
-// Get all categories
 const getCategories = async (req, res) => {
   try {
     const categories = await prismaClient.category.findMany();
     res.status(200).json(categories);
   } catch (error) {
-    res.status(500).json({error: "Error fetching categories"});
+    res.status(500).json({ error: "Error fetching categories" });
   }
 };
 
-// Create a new category
 const createCategory = async (req, res) => {
-  const {name, description} = req.body;
+  const { name, description } = req.body;
   try {
     const category = await prismaClient.category.create({
       data: {
@@ -24,34 +22,32 @@ const createCategory = async (req, res) => {
     });
     res.status(201).json(category);
   } catch (error) {
-    res.status(500).json({error: "Error creating category"});
+    res.status(500).json({ error: "Error creating category" });
   }
 };
 
-// Get a category by ID
 const getCategoryById = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   try {
     const category = await prismaClient.category.findUnique({
-      where: {id: parseInt(id)},
+      where: { id: parseInt(id) },
     });
     if (category) {
       res.status(200).json(category);
     } else {
-      res.status(404).json({error: "Category not found"});
+      res.status(404).json({ error: "Category not found" });
     }
   } catch (error) {
-    res.status(500).json({error: "Error fetching category"});
+    res.status(500).json({ error: "Error fetching category" });
   }
 };
 
-// Update a category by ID
 const updateCategory = async (req, res) => {
-  const {id} = req.params;
-  const {name, description} = req.body;
+  const { id } = req.params;
+  const { name, description } = req.body;
   try {
     const category = await prismaClient.category.update({
-      where: {id: parseInt(id)},
+      where: { id: parseInt(id) },
       data: {
         name,
         description,
@@ -59,20 +55,19 @@ const updateCategory = async (req, res) => {
     });
     res.status(200).json(category);
   } catch (error) {
-    res.status(500).json({error: "Error updating category"});
+    res.status(500).json({ error: "Error updating category" });
   }
 };
 
-// Delete a category by ID
 const deleteCategory = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   try {
     const category = await prismaClient.category.delete({
-      where: {id: parseInt(id)},
+      where: { id: parseInt(id) },
     });
-    res.status(200).json({message: "Category deleted", category});
+    res.status(200).json({ message: "Category deleted", category });
   } catch (error) {
-    res.status(500).json({error: "Error deleting category"});
+    res.status(500).json({ error: "Error deleting category" });
   }
 };
 

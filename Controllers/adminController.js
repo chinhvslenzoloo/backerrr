@@ -9,10 +9,7 @@ exports.getAllUsers = async (req, res) => {
   }
 
   try {
-    // Бүх хэрэглэгчийн мэдээллийг авах
     const user = await prisma.user.findMany();
-
-    // Хэрэглэгчийн мэдээллийг буцаах
     res.json(user);
   } catch (error) {
     console.error("Алдаа гарлаа:", error);

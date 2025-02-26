@@ -4,6 +4,7 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,7 +22,6 @@ model User {
   role         String   @default("user")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
   orders       Order[]
   cartItems    CartItem[]
 }
@@ -32,7 +32,6 @@ model Category {
   description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
   products    Product[]
 }
 
@@ -41,19 +40,18 @@ model Product {
   name          String
   description   String?
   price         Decimal   @db.Decimal(10, 2)
+  costPrice     Decimal   @db.Decimal(10, 2) // Added for profit
   size          String?
   color         String?
   stockQuantity Int       @default(0)
-  imageUrl      String? 
+  imageUrl      String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
   categoryId    Int
   category      Category  @relation(fields: [categoryId], references: [id])
   orderItems    OrderItem[]
   cartItems     CartItem[]
 }
-
 
 model Order {
   id          Int       @id @default(autoincrement())
@@ -61,12 +59,10 @@ model Order {
   status      String    @default("pending")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
-
   orderItems  OrderItem[]
-  payment Payment[]
+  payment     Payment[]
 }
 
 model OrderItem {
@@ -74,10 +70,8 @@ model OrderItem {
   quantity    Int
   price       Decimal   @db.Decimal(10, 2)
   createdAt   DateTime  @default(now())
-
   orderId     Int
   productId   Int
-
   order       Order     @relation(fields: [orderId], references: [id])
   product     Product   @relation(fields: [productId], references: [id])
 }
@@ -86,10 +80,8 @@ model CartItem {
   id          Int       @id @default(autoincrement())
   quantity    Int
   createdAt   DateTime  @default(now())
-
   userId      Int
   productId   Int
-
   user        User      @relation(fields: [userId], references: [id])
   product     Product   @relation(fields: [productId], references: [id])
 }
@@ -98,9 +90,8 @@ model Payment {
   id          Int       @id @default(autoincrement())
   orderId     Int
   amount      Decimal   @db.Decimal(10, 2)
-  method      String   
-  status      String    @default("pending") 
+  method      String
+  status      String    @default("pending")
   createdAt   DateTime  @default(now())
-
   order       Order     @relation(fields: [orderId], references: [id])
 }
